@@ -8,10 +8,13 @@ import {
   saveEvent,
   saveRequest,
 } from '@/lib/repository';
-import type { Ambulance, AmbulanceRequest, DispatchEvent } from '@/types';
+import { QUICK_LOCATION_PRESETS } from '@/data/locations';
+import { MOST_USED_SERVICES } from '@/data/services';
+import type { Ambulance, AmbulanceRequest, DispatchEvent, WorkflowStepId } from '@/types';
 
 const AUTOMATION_TICK_MS = 1000;
-const FEED_INTERVAL_MS = 10000;
+const GPS_TICK_MS = 1200;
+const FEED_INTERVAL_MS = 12000;
 const MAX_SIMULATED_INTAKE = 12;
 
 const INITIAL_STATE: DispatchState = {
@@ -34,6 +37,7 @@ function buildRequest(fields: NewRequestFields): AmbulanceRequest {
     ambulanceId: null,
     declinedAmbulanceIds: [],
     alerts: [],
+    workflowStep: 'disp_check',
   };
 }
 
@@ -102,6 +106,7 @@ export function useDispatchDemo() {
     })();
   }, [state.loaded, state.requests, state.ambulances, state.events]);
 
+  // Automated dispatch loop
   useEffect(() => {
     const id = window.setInterval(() => {
       const action = nextAutomatedAction(stateRef.current, Date.now());
@@ -110,6 +115,17 @@ export function useDispatchDemo() {
     return () => window.clearInterval(id);
   }, []);
 
+  // GPS motion & telemetry updates
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (stateRef.current.loaded) {
+        dispatch({ type: 'gpsTick', at: Date.now() });
+      }
+    }, GPS_TICK_MS);
+    return () => window.clearInterval(id);
+  }, []);
+
+  // Simulated inbound feed loop
   useEffect(() => {
     if (!feedEnabled || !state.loaded || feedFinished) return;
     const id = window.setInterval(() => {
@@ -139,27 +155,80 @@ export function useDispatchDemo() {
     dispatch({ type: 'operatorDecline', at: Date.now(), requestId, reason });
   }, []);
 
+  const operatorAccept = useCallback((requestId: string) => {
+    dispatch({ type: 'operatorAccept', at: Date.now(), requestId });
+  }, []);
+
+  const advanceStage = useCallback((requestId: string) => {
+    dispatch({ type: 'advance', at: Date.now(), requestId });
+  }, []);
+
+  const submitFeedback = useCallback((requestId: string, rating: number, feedback: string) => {
+    dispatch({ type: 'submitFeedback', at: Date.now(), requestId, rating, feedback });
+  }, []);
+
+  const setWorkflowStep = useCallback((requestId: string, step: WorkflowStepId) => {
+    dispatch({ type: 'setWorkflowStep', requestId, step });
+  }, []);
+
   const setAutoDispatch = useCallback((enabled: boolean) => {
     dispatch({ type: 'setAutoDispatch', enabled });
   }, []);
 
   const retryLoad = useCallback(() => setReloadKey((k) => k + 1), []);
 
+  const spawnPresetDemo = useCallback((presetIndex = 0) => {
+    const preset = QUICK_LOCATION_PRESETS[presetIndex % QUICK_LOCATION_PRESETS.length];
+    const { fields } = nextSimulatedMessage(presetIndex);
+    return createRequest({
+      ...fields,
+      pickupArea: preset.area,
+      pickupNote: preset.landmark,
+      pickupCoords: preset.coords,
+    });
+  }, [createRequest]);
+
+  const spawnServiceDemo = useCallback((serviceId: string) => {
+    const service = MOST_USED_SERVICES.find((s) => s.id === serviceId) || MOST_USED_SERVICES[0];
+    const preset = QUICK_LOCATION_PRESETS[Math.floor(Math.random() * QUICK_LOCATION_PRESETS.length)];
+    return createRequest({
+      channel: 'Mobile app',
+      network: 'private',
+      pickupArea: preset.area,
+      pickupNote: preset.landmark,
+      pickupCoords: preset.coords,
+      patientName: service.id === 'child' ? 'Aarav (Child)' : service.id === 'accident' ? 'Collision Victim' : 'Emergency Patient',
+      patientPhone: '+91 98450 11223',
+      patientAge: service.defaultAge ? Number(service.defaultAge) : 34,
+      description: service.descriptionTemplate,
+      category: service.recommendedCategory,
+      serviceType: service.title,
+      aiCaptured: false,
+      externalRef: null,
+    });
+  }, [createRequest]);
+
   return {
     loaded: state.loaded,
     loadError,
     saveError,
-    retryLoad,
     requests: state.requests,
     ambulances: state.ambulances,
     events: state.events,
     autoDispatch: state.autoDispatch,
-    setAutoDispatch,
     feedEnabled,
-    setFeedEnabled,
     feedFinished,
+    retryLoad,
     createRequest,
     assign,
     decline,
+    operatorAccept,
+    advanceStage,
+    submitFeedback,
+    setWorkflowStep,
+    setAutoDispatch,
+    setFeedEnabled,
+    spawnPresetDemo,
+    spawnServiceDemo,
   };
 }

@@ -84,7 +84,14 @@ function RequestDetail({
           </div>
         </div>
         <div className="border-2 border-ink bg-white p-3">
-          <dt className="font-display text-base tracking-wide text-ink/70">Reported situation</dt>
+          <div className="flex items-center justify-between">
+            <dt className="font-display text-base tracking-wide text-ink/70">Reported situation</dt>
+            {request.serviceType && (
+              <span className="rounded bg-comic-yellow px-1.5 py-0.5 text-[10px] font-bold text-ink border border-ink">
+                {request.serviceType}
+              </span>
+            )}
+          </div>
           <dd className="mt-1 text-ink">{request.description}</dd>
         </div>
       </dl>

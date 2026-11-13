@@ -4,11 +4,12 @@ import SiteFooter from '@/components/SiteFooter';
 import HomePage from '@/components/home/HomePage';
 import RequestPage from '@/components/request/RequestPage';
 import DispatchPage from '@/components/dispatch/DispatchPage';
+import SimulationPage from '@/components/simulation/SimulationPage';
 import { useDispatchDemo } from '@/hooks/useDispatchDemo';
 import type { View } from '@/types';
 
 function App() {
-  const [view, setView] = useState<View>('home');
+  const [view, setView] = useState<View>('simulation');
   const dispatch = useDispatchDemo();
 
   const navigate = (next: View) => {
@@ -38,6 +39,23 @@ function App() {
             onFeedEnabledChange={dispatch.setFeedEnabled}
             onAssign={dispatch.assign}
             onDecline={dispatch.decline}
+            onNavigate={navigate}
+          />
+        )}
+        {view === 'simulation' && (
+          <SimulationPage
+            requests={dispatch.requests}
+            ambulances={dispatch.ambulances}
+            autoDispatch={dispatch.autoDispatch}
+            onAutoDispatchChange={dispatch.setAutoDispatch}
+            onAssign={dispatch.assign}
+            onDecline={dispatch.decline}
+            onOperatorAccept={dispatch.operatorAccept}
+            onAdvanceStage={dispatch.advanceStage}
+            onSubmitFeedback={dispatch.submitFeedback}
+            onSpawnPresetDemo={dispatch.spawnPresetDemo}
+            onSpawnServiceDemo={dispatch.spawnServiceDemo}
+            onNavigate={navigate}
           />
         )}
       </main>

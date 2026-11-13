@@ -1,3 +1,4 @@
+import { calculateDistanceKm, getCoordinatesForArea } from '@/data/locations';
 import type { Ambulance, AmbulanceRequest } from '@/types';
 
 export function isSuitable(ambulance: Ambulance, request: AmbulanceRequest): boolean {
@@ -8,7 +9,22 @@ export function isSuitable(ambulance: Ambulance, request: AmbulanceRequest): boo
 }
 
 export function rankCandidates(ambulances: Ambulance[], request: AmbulanceRequest): Ambulance[] {
-  const score = (a: Ambulance) =>
-    (a.area === request.pickupArea ? 2 : 0) + (a.category === request.category ? 1 : 0);
-  return ambulances.filter((a) => isSuitable(a, request)).sort((a, b) => score(b) - score(a));
+  const pickupPoint = request.pickupCoords || getCoordinatesForArea(request.pickupArea);
+
+  const calculateScore = (a: Ambulance) => {
+    const ambPoint = a.coords || getCoordinatesForArea(a.area);
+    const distanceKm = calculateDistanceKm(ambPoint, pickupPoint);
+    // Base score for category match
+    const categoryBonus = a.category === request.category ? 15 : 5;
+    // Same area bonus
+    const areaBonus = a.area === request.pickupArea ? 10 : 0;
+    // Distance penalty (closer is better, max range ~ 30km)
+    const distanceScore = Math.max(0, 30 - distanceKm);
+
+    return categoryBonus + areaBonus + distanceScore;
+  };
+
+  return ambulances
+    .filter((a) => isSuitable(a, request))
+    .sort((a, b) => calculateScore(b) - calculateScore(a));
 }

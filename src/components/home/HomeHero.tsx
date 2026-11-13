@@ -23,9 +23,12 @@ export default function HomeHero({ onNavigate }: HomeHeroProps) {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
-            <button onClick={() => onNavigate('request')} className="comic-button-primary">
-              <Ambulance className="h-5 w-5" /> Request ambulance
+            <button onClick={() => onNavigate('simulation')} className="comic-button-primary">
+              <Ambulance className="h-5 w-5" /> BPMN Simulation Demo
               <ArrowRight className="h-5 w-5" />
+            </button>
+            <button onClick={() => onNavigate('request')} className="comic-button-ghost">
+              Request ambulance
             </button>
             <button onClick={() => onNavigate('dispatch')} className="comic-button-yellow">
               <LayoutDashboard className="h-5 w-5" /> Dispatch console

@@ -6,6 +6,7 @@ export interface RequestDraft {
   patientAge: string;
   description: string;
   category: 'BLS' | 'ALS' | 'Patient Transport';
+  serviceType?: string;
 }
 
 export type DraftErrors = Partial<Record<keyof RequestDraft, string>>;
@@ -21,7 +22,11 @@ export function validateLocation(draft: RequestDraft): DraftErrors {
 
 export function validatePatient(draft: RequestDraft): DraftErrors {
   const errors: DraftErrors = {};
-  if (draft.patientName.trim().length < 2) errors.patientName = 'Enter the patient name.';
+  // Patient name can be unknown (e.g. road accident, bystander report, or unconscious victim)
+  // Only validate if a custom name is entered and is too short
+  if (draft.patientName.trim().length === 1) {
+    errors.patientName = 'Enter at least 2 characters, or leave empty if unknown.';
+  }
   const digits = draft.patientPhone.replace(/\D/g, '');
   if (digits.length < 10 || digits.length > 13) {
     errors.patientPhone = 'Enter a valid contact number with 10 digits.';

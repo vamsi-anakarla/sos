@@ -7,49 +7,38 @@ interface ReviewStepProps {
 
 export default function ReviewStep({ draft }: ReviewStepProps) {
   const rows: [string, string][] = [
-    ['Area', draft.pickupArea],
-    ['Landmark', draft.pickupNote],
-    ['Patient', draft.patientName],
-    ['Contact', draft.patientPhone],
-    ['Age', draft.patientAge || 'Not provided'],
-    ['Situation', draft.description],
-    ['Assistance type', draft.category],
+    ['Area & Pickup', `${draft.pickupArea || 'Not specified'} (${draft.pickupNote || 'No landmark'})`],
+    ['Patient Name', draft.patientName.trim() || 'Unknown Patient'],
+    ['Contact Phone', draft.patientPhone || 'Not provided'],
+    ['Age', draft.patientAge ? `${draft.patientAge} years` : 'Not provided'],
+    ['Emergency Service', draft.serviceType || 'General Emergency'],
+    ['Life Support Type', draft.category],
+    ['Situation Notes', draft.description || 'Standard emergency protocol'],
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl text-ink">Review and submit</h2>
-        <p className="text-sm text-ink/70">Check the details. A dispatcher will confirm them with you.</p>
+    <div className="space-y-3">
+      <div className="border-b-2 border-ink pb-1">
+        <h2 className="font-display text-xl sm:text-2xl text-ink leading-tight">Review & Confirm Request</h2>
+        <p className="text-xs text-ink/70">Verify details before transmitting to Central Dispatch.</p>
       </div>
 
-      <dl className="divide-y-2 divide-ink/20 border-4 border-ink bg-white">
+      {/* Compact 2-column or grid summary */}
+      <div className="rounded-lg border-2 border-ink bg-white overflow-hidden text-xs divide-y divide-ink/15">
         {rows.map(([label, value]) => (
-          <div key={label} className="grid gap-1 px-4 py-3 sm:grid-cols-[160px_1fr] sm:gap-4">
-            <dt className="font-display text-lg tracking-wide text-ink/70">{label}</dt>
-            <dd className="break-words text-base text-ink">{value}</dd>
+          <div key={label} className="grid grid-cols-[140px_1fr] items-center px-3 py-1.5 gap-2">
+            <span className="font-display text-ink/70">{label}:</span>
+            <span className="font-semibold text-ink truncate">{value}</span>
           </div>
         ))}
-      </dl>
+      </div>
 
-      <div className="space-y-3">
-        <h3 className="font-display text-xl tracking-wider text-ink">Network</h3>
-        <div className="flex items-start gap-3 border-4 border-ink bg-comic-yellow p-4 shadow-panel-sm">
-          <CircleCheck className="mt-0.5 h-6 w-6 shrink-0" strokeWidth={2.5} />
-          <div>
-            <p className="font-display text-lg tracking-wide">Private ambulance network</p>
-            <p className="text-sm text-ink/80">Selected. Requests go to registered private operators in the demo fleet.</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-3 border-4 border-dashed border-ink/50 bg-comic-cream p-4 text-ink/70">
-          <Lock className="mt-0.5 h-6 w-6 shrink-0" strokeWidth={2.5} />
-          <div>
-            <p className="font-display text-lg tracking-wide">Government 108 network</p>
-            <p className="text-sm">
-              Not available here. Integration needs official authorisation, so this demo cannot dispatch
-              government ambulances.
-            </p>
-          </div>
+      {/* Compact Network Badge */}
+      <div className="flex items-center gap-2 rounded-lg border-2 border-ink bg-comic-yellow px-3 py-2 shadow-xs text-xs">
+        <CircleCheck className="h-4 w-4 text-ink shrink-0" strokeWidth={2.5} />
+        <div>
+          <span className="font-display tracking-wide font-bold">Private Ambulance Network: </span>
+          <span className="text-ink/80">Request will be instantly beamed to registered city fleet operators.</span>
         </div>
       </div>
     </div>
