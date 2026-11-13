@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import SiteFooter from '@/components/SiteFooter';
 import HomePage from '@/components/home/HomePage';
@@ -8,12 +8,43 @@ import SimulationPage from '@/components/simulation/SimulationPage';
 import { useDispatchDemo } from '@/hooks/useDispatchDemo';
 import type { View } from '@/types';
 
+function getInitialView(): View {
+  if (typeof window !== 'undefined') {
+    const hash = window.location.hash.replace('#', '');
+    if (hash === 'request' || hash === 'dispatch' || hash === 'simulation') {
+      return hash;
+    }
+  }
+  return 'home';
+}
+
 function App() {
-  const [view, setView] = useState<View>('simulation');
+  const [view, setView] = useState<View>(getInitialView);
   const dispatch = useDispatchDemo();
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'request' || hash === 'dispatch' || hash === 'simulation') {
+        setView(hash);
+      } else {
+        setView('home');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const navigate = (next: View) => {
     setView(next);
+    if (next === 'home') {
+      if (window.location.hash) {
+        window.history.pushState(null, '', window.location.pathname);
+      }
+    } else {
+      window.location.hash = next;
+    }
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
