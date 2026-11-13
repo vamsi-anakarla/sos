@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply text-ink font-body antialiased;
+    background-color: #d9d4c7;
+    background-image: radial-gradient(#1c1c1c22 1.2px, transparent 1.4px);
+    background-size: 10px 10px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-wide;
+    line-height: 1.2;
+  }
+
+  p {
+    line-height: 1.5;
+  }
+}
+
+@layer components {
+  .halftone-dark {
+    background-color: #1c1c1c;
+    background-image: radial-gradient(#ffffff14 1.4px, transparent 1.6px);
+    background-size: 8px 8px;
+  }
+
+  .halftone-red {
+    background-color: #e52421;
+    background-image: radial-gradient(#b81a1744 1.6px, transparent 1.8px);
+    background-size: 9px 9px;
+  }
+
+  .halftone-yellow {
+    background-color: #fff28a;
+    background-image: radial-gradient(#e8a50f33 1.4px, transparent 1.6px);
+    background-size: 9px 9px;
+  }
+
+  .comic-panel {
+    @apply bg-comic-cream border-4 border-ink shadow-panel;
+  }
+
+  .comic-panel-dark {
+    @apply bg-ink-soft border-4 border-ink shadow-panel text-comic-cream;
+  }
+
+  .comic-button {
+    @apply inline-flex items-center justify-center gap-2 border-4 border-ink font-display text-xl tracking-wider px-6 py-3 shadow-panel-sm transition-all duration-150 select-none;
+  }
+
+  .comic-button:hover:not(:disabled) {
+    @apply -translate-x-0.5 -translate-y-0.5 shadow-panel;
+  }
+
+  .comic-button:active:not(:disabled) {
+    @apply translate-x-0.5 translate-y-0.5 shadow-none;
+  }
+
+  .comic-button:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .comic-button-primary {
+    @apply comic-button bg-comic-red text-comic-cream;
+  }
+
+  .comic-button-yellow {
+    @apply comic-button bg-comic-yellow-deep text-ink;
+  }
+
+  .comic-button-ghost {
+    @apply comic-button bg-comic-cream text-ink;
+  }
+
+  .comic-input {
+    @apply w-full border-4 border-ink bg-white px-4 py-3 font-body text-base text-ink placeholder:text-ink/40 focus:outline-none focus:ring-4 focus:ring-comic-orange/60;
+  }
+
+  .comic-tag {
+    @apply inline-flex items-center gap-1 border-2 border-ink px-2 py-0.5 font-display text-sm tracking-wider;
+  }
+
+  .speech-bubble {
+    @apply relative bg-white border-4 border-ink rounded-[28px] shadow-panel-sm;
+  }
+
+  .speech-bubble::after {
+    content: '';
+    @apply absolute w-6 h-6 bg-white border-r-4 border-b-4 border-ink;
+    left: 40px;
+    bottom: -14px;
+    transform: rotate(45deg);
+  }
+
+  .starburst {
+    clip-path: polygon(
+      50% 0%, 61% 14%, 79% 6%, 81% 24%, 98% 26%, 90% 42%, 100% 56%, 86% 64%,
+      94% 82%, 76% 82%, 70% 100%, 56% 88%, 42% 100%, 34% 84%, 16% 90%, 16% 72%,
+      0% 66%, 10% 52%, 0% 36%, 16% 30%, 12% 12%, 30% 16%
+    );
+  }
+
+  .ray-burst {
+    background: repeating-conic-gradient(
+      from 0deg,
+      #fff28a 0deg 8deg,
+      transparent 8deg 18deg
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
