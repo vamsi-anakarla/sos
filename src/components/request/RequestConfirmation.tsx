@@ -3,7 +3,6 @@ import {
   CheckCircle2,
   Clock,
   LayoutDashboard,
-  MapPin,
   RotateCcw,
 } from 'lucide-react';
 import type { View } from '@/types';
@@ -57,27 +56,6 @@ export default function RequestConfirmation({
           </div>
 
           <div className="space-y-2 text-xs">
-            <div className="flex flex-wrap items-center justify-between gap-1.5 rounded bg-white p-2.5 border border-ink/20">
-              <div>
-                <span className="font-bold text-ink">📱 SMS to Caller Phone: </span>
-                <span className="font-mono text-ink/80">{smsResult?.userPhone || patientPhone}</span>
-                <p className="text-[11px] text-ink/70 mt-0.5">
-                  "Pranrath Ambulance is coming to your location: {smsResult?.mapLink} ({pickupArea}). Ref ID: {requestId}. Emergency crew is en route."
-                </p>
-              </div>
-              {smsResult?.mapLink && (
-                <a
-                  href={smsResult.mapLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded border-2 border-ink bg-comic-yellow px-2 py-1 text-[11px] font-bold text-ink hover:bg-comic-yellow-deep transition-all flex items-center gap-1 shrink-0 shadow-xs"
-                >
-                  <MapPin className="h-3.5 w-3.5 text-comic-red" />
-                  Open Google Maps
-                </a>
-              )}
-            </div>
-
             <div className="flex flex-wrap items-center justify-between gap-1.5 rounded bg-white p-2.5 border border-ink/20">
               <div>
                 <span className="font-bold text-ink">🚨 SMS to Central Emergency Admin</span>
